@@ -1,0 +1,66 @@
+version: "3.7"
+
+services:
+  front:
+    build:
+      context: ./front-corporate-travel
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+        VITE_API_URL: http://app:8989/api
+        VITE_PUBLIC_API_URL: http://localhost:8989/api
+    depends_on:
+    - app    
+    networks:
+        - app-network
+  app :
+    build:
+      context: ./corporate_travel
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    working_dir: /var/www/
+    environment:
+        DB_DATABASE: travel
+        DB_USERNAME: root
+        DB_PASSWORD: root
+    # volumes:
+    #   - ./corporate_travel:/var/www
+    depends_on:
+        - db
+    networks:
+      - app-network
+
+  app-nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "8989:80"
+    volumes:
+      - ./corporate_travel:/var/www
+      - ./corporate_travel/docker/nginx/:/etc/nginx/conf.d/
+    depends_on:
+    - app  
+    networks:
+      - app-network
+
+  db:
+    image: mysql:5.7.22
+    platform: linux/x86_64
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: travel
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+      MYSQL_USER: root
+    # volumes:
+    #   - ./.docker/mysql/dbdata:/var/lib/mysql
+    ports:
+      - "3388:3306"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
