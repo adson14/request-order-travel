@@ -1,0 +1,6 @@
+[submodule "front-corporate-travel"]
+	path = front-corporate-travel
+	url = https://github.com/adson14/front-corporate-travel.git
+[submodule "corporate_travel"]
+	path = corporate_travel
+	url = https://github.com/adson14/corporate_travel.git
